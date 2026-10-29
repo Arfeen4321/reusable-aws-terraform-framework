@@ -117,7 +117,7 @@ tags = {{
 def main():
     parser = argparse.ArgumentParser(description="Generate Free Tier tfvars for Terraform")
     parser.add_argument("--count", type=int, default=1, help="Number of instances to create")
-    parser.add_argument("--instance-type", default="t2.micro", choices=["t2.micro", "t3.micro"], help="Instance type")
+    parser.add_argument("--instance-type", default="t3.micro", choices=["t3.micro", "t2.micro"], help="Instance type")
     parser.add_argument("--os", default="ubuntu", choices=["ubuntu", "amazon-linux"], help="OS flavor")
     parser.add_argument("--volume-gb", type=int, default=10, help="EBS size in GB per instance")
     parser.add_argument("--env", default="dev", help="Environment (e.g. dev)")

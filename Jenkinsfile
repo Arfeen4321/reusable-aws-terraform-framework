@@ -24,8 +24,8 @@ pipeline {
         )
         choice(
             name: 'INSTANCE_TYPE',
-            choices: ['t2.micro', 't3.micro'],
-            description: 'AWS Free-Tier eligible instance type (t2.micro / t3.micro)'
+            choices: ['t3.micro', 't2.micro'],
+            description: 'AWS Free-Tier eligible instance type (t3.micro is default for modern AWS accounts)'
         )
         choice(
             name: 'OS_TYPE',
