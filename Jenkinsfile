@@ -14,13 +14,13 @@ pipeline {
     parameters {
         choice(
             name: 'ACTION',
-            choices: ['plan', 'apply', 'destroy'],
-            description: 'Select Terraform Action: plan (dry-run preview), apply (provision to AWS), or destroy (teardown)'
+            choices: ['apply', 'plan', 'destroy'],
+            description: 'Select Terraform Action: apply (provision to AWS), plan (dry-run preview), or destroy (teardown)'
         )
         string(
             name: 'INSTANCE_COUNT',
-            defaultValue: '1',
-            description: 'Number of EC2 instances to provision (e.g. 1, 2, 3...)'
+            defaultValue: '5',
+            description: 'Number of EC2 instances to provision (5 nodes: 1 Prometheus Server + 4 Targets)'
         )
         choice(
             name: 'INSTANCE_TYPE',
@@ -34,8 +34,18 @@ pipeline {
         )
         string(
             name: 'ROOT_VOLUME_GB',
-            defaultValue: '10',
-            description: 'Disk size in GB per instance (Keep total across all nodes <= 30 GB to stay 100% Free Tier!)'
+            defaultValue: '6',
+            description: 'Disk size in GB per instance. For 5 nodes, 6 GB each = 30 GB total (100% Free-Tier compliant!)'
+        )
+        choice(
+            name: 'SUBNET_TYPE',
+            choices: ['public', 'private'],
+            description: 'Subnet type: public assigns real Public IP for instant 1-click browser Connect & SSM; private is fully isolated.'
+        )
+        string(
+            name: 'KEY_NAME',
+            defaultValue: '',
+            description: 'Optional AWS Key Pair name (e.g. your-key) if you want to SSH with PEM key. Leave empty for 1-click Console Connect.'
         )
         choice(
             name: 'ENVIRONMENT',
@@ -71,6 +81,8 @@ pipeline {
                     echo "  AWS FREE-TIER COMPLIANCE CHECK"
                     echo "================================================================="
                     echo "Requested Instances: ${count} x ${params.INSTANCE_TYPE}"
+                    echo "Subnet Type:         ${params.SUBNET_TYPE}"
+                    echo "Key Pair Name:       ${params.KEY_NAME ?: 'None (Using SSM / EC2 Instance Connect)'}"
                     echo "Requested Storage:   ${count} x ${volSize} GB = ${totalStorage} GB"
                     echo "Target Environment:  ${params.ENVIRONMENT}"
                     echo "NAT Gateway:         DISABLED (Saves \$32.85/month!)"
@@ -94,7 +106,7 @@ pipeline {
                     def pythonCmd = isUnix() ? "python3" : "python"
                     
                     // Run python helper to generate tfvars dynamically
-                    sh "${pythonCmd} scripts/generate_free_tier_tfvars.py --count ${params.INSTANCE_COUNT} --instance-type ${params.INSTANCE_TYPE} --os ${params.OS_TYPE} --volume-gb ${params.ROOT_VOLUME_GB} --env ${params.ENVIRONMENT} --output ${env.ENV_DIR}/terraform.tfvars"
+                    sh "${pythonCmd} scripts/generate_free_tier_tfvars.py --count ${params.INSTANCE_COUNT} --instance-type ${params.INSTANCE_TYPE} --os ${params.OS_TYPE} --volume-gb ${params.ROOT_VOLUME_GB} --env ${params.ENVIRONMENT} --subnet-type ${params.SUBNET_TYPE} --key-name '${params.KEY_NAME}' --output ${env.ENV_DIR}/terraform.tfvars"
                 }
             }
         }
