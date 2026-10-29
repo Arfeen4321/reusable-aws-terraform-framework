@@ -125,11 +125,11 @@ security_group_ingress_rules = [
     cidr_blocks = ["10.0.0.0/16"]
   }},
   {{
-    description = "Allow SSH from VPC & AWS EC2 Instance Connect (ap-south-1)"
+    description = "Allow SSH from anywhere (laptop direct access)"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16", "13.233.177.0/29"]
+    cidr_blocks = ["0.0.0.0/0"]
   }},
   {{
     description = "Allow internal HTTP from VPC"

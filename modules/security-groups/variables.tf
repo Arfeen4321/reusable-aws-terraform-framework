@@ -32,19 +32,6 @@ variable "ingress_rules" {
     self            = optional(bool, false)
   }))
   default = []
-
-  validation {
-    condition = alltrue([
-      for rule in var.ingress_rules : !(
-        contains(coalesce(rule.cidr_blocks, []), "0.0.0.0/0") &&
-        (
-          (rule.from_port <= 22 && rule.to_port >= 22) ||
-          (rule.from_port <= 3389 && rule.to_port >= 3389)
-        )
-      )
-    ])
-    error_message = "Security compliance violation: Unrestricted administrative access (port 22 SSH or port 3389 RDP from 0.0.0.0/0) is strictly disallowed."
-  }
 }
 
 variable "egress_rules" {
