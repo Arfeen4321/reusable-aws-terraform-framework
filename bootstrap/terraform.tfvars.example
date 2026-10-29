@@ -1,0 +1,10 @@
+aws_region   = "ap-south-1"
+project_name = "iac-framework"
+force_destroy = false
+kms_key_arn  = null
+
+tags = {
+  Owner       = "DevOps-Team"
+  Component   = "Terraform-Remote-State"
+  Environment = "bootstrap"
+}

@@ -1,0 +1,29 @@
+# Terraform local directories and cache
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform variable definitions containing secrets
+*.tfvars
+!*.tfvars.example
+*.auto.tfvars
+
+# CLI configuration and backend config files containing secrets
+.terraformrc
+terraform.rc
+backend-config.hcl
+
+# IDE and OS specific
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
