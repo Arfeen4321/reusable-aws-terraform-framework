@@ -8,7 +8,6 @@ pipeline {
 
     options {
         timestamps()
-        ansiColor('xterm')
         disableConcurrentBuilds()
     }
 
@@ -102,12 +101,11 @@ pipeline {
 
         stage('Terraform Init & Validate') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
+                withCredentials([usernamePassword(
                     credentialsId: params.AWS_CREDENTIALS_ID,
-                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                ]]) {
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
                     dir(env.ENV_DIR) {
                         echo "[Step 2/5] Initializing Terraform..."
                         sh 'terraform init'
@@ -124,12 +122,11 @@ pipeline {
                 expression { params.ACTION != 'destroy' }
             }
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
+                withCredentials([usernamePassword(
                     credentialsId: params.AWS_CREDENTIALS_ID,
-                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                ]]) {
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
                     dir(env.ENV_DIR) {
                         echo "[Step 4/5] Generating execution plan..."
                         sh 'terraform plan -out=tfplan'
@@ -158,12 +155,11 @@ pipeline {
                 expression { params.ACTION == 'apply' }
             }
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
+                withCredentials([usernamePassword(
                     credentialsId: params.AWS_CREDENTIALS_ID,
-                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                ]]) {
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
                     dir(env.ENV_DIR) {
                         echo "[Step 5/5] Applying approved infrastructure..."
                         sh 'terraform apply -input=false tfplan'
@@ -188,12 +184,11 @@ pipeline {
                         input message: "DANGER: You are about to DESTROY the PRODUCTION environment! Confirm destruction?", ok: "Yes, destroy production"
                     }
                 }
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
+                withCredentials([usernamePassword(
                     credentialsId: params.AWS_CREDENTIALS_ID,
-                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                ]]) {
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
                     dir(env.ENV_DIR) {
                         echo "Decommissioning Free-Tier resources..."
                         sh 'terraform destroy -auto-approve'
